@@ -39,7 +39,7 @@ GENDERS = {
 }
 
 config = {
-    "LOG_FILE_PATH": "../log/app.log",
+    "LOG_FILE_PATH": "../app.log",
 }
 
 if config.get("LOG_FILE_PATH"):
