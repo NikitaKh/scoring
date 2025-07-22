@@ -27,7 +27,7 @@ build-backend = "poetry.core.masonry.api"
 testpaths = ["tests"]
 
 [tool.black]
-line-length = 120
+line-length = 150
 target-version = ['py312']
 
 [tool.isort]
@@ -46,6 +46,6 @@ disable_error_code = ["name-defined"]
 ignore_missing_imports = true
 
 [tool.flake8]
-max-line-length = 120
+max-line-length = 150
 extend-ignore = ["E203", "W503"]
 #extend-ignore = E501
