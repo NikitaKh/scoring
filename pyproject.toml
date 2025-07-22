@@ -4,10 +4,11 @@ version = "0.1.0"
 description = "Scoring Project"
 authors = ["Nikita"]
 readme = "README.md"
-packages = [{ include = "scoring" }, { include = "tests" }]
+packages = [{ include = "scoring" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
+tarantool = "^1.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.2.0"
@@ -16,10 +17,14 @@ mypy = "^1.17.0"
 flake8 = "^7.3.0"
 pytest = "^8.4.1"
 isort = "^6.0.1"
+pytest-cov = "^6.2.1"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.black]
 line-length = 120

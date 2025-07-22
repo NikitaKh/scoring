@@ -1,0 +1,29 @@
+credentials:
+  users:
+    sampleuser:
+      password: '123456'
+      privileges:
+      - permissions: [ read, write ]
+        spaces: [ scoring ]
+      - permissions: [ execute ]
+        functions: [ cache_get ]
+      - permissions: [ execute ]
+        functions: [ cache_set ]
+      - permissions: [ read, write ]
+        spaces: [ interests ]
+      - permissions: [ execute ]
+        functions: [ interests_get ]
+
+
+groups:
+  group001:
+    replicasets:
+      replicaset001:
+        instances:
+          instance001:
+            iproto:
+              listen:
+              - uri: '127.0.0.1:3301'
+
+app:
+  file: 'scoring.lua'

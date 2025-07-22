@@ -11,6 +11,8 @@ from argparse import ArgumentParser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
+import tarantool
+
 from scoring.service.scoring import Scoring
 
 SALT = "Otus"
@@ -39,7 +41,13 @@ GENDERS = {
 }
 
 config = {
-    "LOG_FILE_PATH": "../app.log",
+    # "LOG_FILE_PATH": "../app.log",
+    "T_HOST": "localhost",
+    "T_PORT": 3301,
+    "T_USERNAME": "sampleuser",
+    "T_PASSWORD": "123456",
+    "RECONNECT_MAX_ATTEMPTS": 5,
+    "CONNECTION_TIMEOUT": 60,
 }
 
 if config.get("LOG_FILE_PATH"):
@@ -224,6 +232,9 @@ def method_handler(request, ctx, store):
     logger.info(f"Processing method: {method_name}")
 
     if method_name == "clients_interests":
+
+        sc = Scoring(store.space("interests"))
+
         clients_interests_req = ClientsInterestsRequest(**request["body"]["arguments"])
         if not clients_interests_req.is_valid():
             logger.error(f"Invalid clients_interests request: {clients_interests_req.errors}")
@@ -232,10 +243,13 @@ def method_handler(request, ctx, store):
         client_ids = clients_interests_req.cleaned_data.get("client_ids")
         ctx["nclients"] = len(client_ids)
 
-        response = {cid: Scoring.get_interests() for cid in clients_interests_req.cleaned_data.get("client_ids")}
+        response = {cid: sc.get_interests(cid) for cid in clients_interests_req.cleaned_data.get("client_ids")}
         logger.info(f"clients_interests response: {response}")
         return response, OK
     elif method_name == "online_score":
+
+        sc = Scoring(store.space("scoring"))
+
         online_score_req = OnlineScoreRequest(**request["body"]["arguments"])
         if not online_score_req.is_valid():
             logger.error(f"Invalid online_score request: {online_score_req.errors}")
@@ -251,7 +265,7 @@ def method_handler(request, ctx, store):
         if request["body"].get("login") == ADMIN_LOGIN:
             score = 42
         else:
-            score = Scoring.get_score(**online_score_req.cleaned_data)
+            score = sc.get_score(**online_score_req.cleaned_data)
         logger.info(f"online_score result: {score}")
         return {"score": score}, OK
 
@@ -261,7 +275,15 @@ def method_handler(request, ctx, store):
 
 class MainHTTPHandler(BaseHTTPRequestHandler):
     router = {"method": method_handler}
-    store = None
+
+    store = tarantool.Connection(
+        config.get("T_HOST"),
+        config.get("T_PORT"),
+        user=config.get("T_USERNAME"),
+        password=config.get("T_PASSWORD"),
+        reconnect_max_attempts=config.get("RECONNECT_MAX_ATTEMPTS"),
+        connection_timeout=config.get("CONNECTION_TIMEOUT"),
+    )
 
     def get_request_id(self, headers):
         return headers.get("HTTP_X_REQUEST_ID", uuid.uuid4().hex)

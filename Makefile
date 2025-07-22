@@ -6,11 +6,14 @@ run:
 
 # Запуск тестов
 test:
-	poetry run python -m tests.test
+	poetry run pytest
+
+# Запуск тестов с покрытием
+coverage:
+	poetry run pytest --cov=scoring --cov-report=term
 
 # Проверки: mypy + flake8
 lint:
-	#poetry run mypy scoring/
 	poetry run flake8 scoring/ tests/
 
 # Форматирование: black + isort
@@ -23,7 +26,6 @@ check-all:
 	poetry run black . --check
 	poetry run isort . --check-only
 	poetry run flake8 scoring tests
-	#poetry run mypy scoring
 
 # Синхронизация poetry
 sync:
