@@ -210,9 +210,7 @@ def check_auth(request):
     if request.is_admin:
         digest = hashlib.sha512((datetime.datetime.now().strftime("%Y%m%d%H") + ADMIN_SALT).encode("utf-8")).hexdigest()
     else:
-        digest = hashlib.sha512(
-            (request.cleaned_data.get("account") + request.cleaned_data.get("login") + SALT).encode("utf-8")
-        ).hexdigest()
+        digest = hashlib.sha512((request.cleaned_data.get("account") + request.cleaned_data.get("login") + SALT).encode("utf-8")).hexdigest()
     return digest == request.cleaned_data.get("token")
 
 

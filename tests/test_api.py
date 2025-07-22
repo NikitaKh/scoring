@@ -72,9 +72,7 @@ def fake_store():
 
 def set_valid_auth(request):
     if request.get("login") == ADMIN_LOGIN:
-        request["token"] = hashlib.sha512(
-            (datetime.datetime.now().strftime("%Y%m%d%H") + ADMIN_SALT).encode("utf-8")
-        ).hexdigest()
+        request["token"] = hashlib.sha512((datetime.datetime.now().strftime("%Y%m%d%H") + ADMIN_SALT).encode("utf-8")).hexdigest()
     else:
         msg = (request.get("account", "") + request.get("login", "") + SALT).encode("utf-8")
         request["token"] = hashlib.sha512(msg).hexdigest()
